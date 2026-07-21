@@ -1,8 +1,21 @@
 FROM php:8.2-apache
 
-RUN a2enmod rewrite
+RUN apt-get update && apt-get install -y \
+    libzip-dev \
+    unzip \
+ && docker-php-ext-install mysqli zip \
+ && a2enmod rewrite \
+ && rm -rf /var/lib/apt/lists/*
 
-RUN echo "<?php phpinfo(); ?>" > /var/www/html/index.php
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+WORKDIR /var/www/html
+
+COPY . .
+
+RUN composer install --no-dev --optimize-autoloader --no-interaction || true
+
+RUN chown -R www-data:www-data /var/www/html
 
 EXPOSE 80
 
