@@ -1,6 +1,8 @@
 FROM php:8.2-apache
-
-RUN docker-php-ext-install mysqli && a2enmod rewrite
+RUN apt-get update && apt-get install -y --no-install-recommends libzip-dev unzip \
+    && docker-php-ext-install mysqli zip \
+    && a2enmod rewrite \
+    && rm -rf /var/lib/apt/lists/*
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 COPY . /var/www/html/version_final
