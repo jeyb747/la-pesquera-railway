@@ -2,10 +2,15 @@
 /* Gmail SMTP. Install dependencies with: composer install */
 function enviar_correo($destino, $asunto, $titulo, $mensaje) {
     if (!filter_var($destino, FILTER_VALIDATE_EMAIL)) return false;
-    $configFile = __DIR__ . '/mail_config.php';
     $autoload = dirname(__DIR__, 2) . '/vendor/autoload.php';
-    if (!is_file($configFile) || !is_file($autoload)) return false;
-    $config = require $configFile;
+    if (!is_file($autoload)) return false;
+    $configFile = __DIR__ . '/mail_config.php';
+    $config = is_file($configFile) ? require $configFile : [];
+    $config['host'] = getenv('MAIL_HOST') ?: ($config['host'] ?? 'smtp.gmail.com');
+    $config['port'] = getenv('MAIL_PORT') ?: ($config['port'] ?? 587);
+    $config['username'] = getenv('MAIL_USERNAME') ?: ($config['username'] ?? '');
+    $config['password'] = getenv('MAIL_PASSWORD') ?: ($config['password'] ?? '');
+    $config['from_name'] = getenv('MAIL_FROM_NAME') ?: ($config['from_name'] ?? 'La Pesquera');
     if (empty($config['username']) || empty($config['password'])) return false;
     require_once $autoload;
     try {
