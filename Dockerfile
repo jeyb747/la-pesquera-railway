@@ -1,16 +1,9 @@
 FROM php:8.2-apache
-RUN apt-get update && apt-get install -y --no-install-recommends libzip-dev unzip \
-    && docker-php-ext-install mysqli zip \
-    && a2dismod mpm_event || true \
-    && a2dismod mpm_worker || true \
-    && a2enmod mpm_prefork rewrite \
-    && rm -rf /var/lib/apt/lists/*
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-WORKDIR /var/www/html
-COPY . /var/www/html/version_final
-RUN cd /var/www/html/version_final && composer install --no-dev --optimize-autoloader --no-interaction
-COPY railway-start.sh /usr/local/bin/railway-start
-RUN chmod +x /usr/local/bin/railway-start && chown -R www-data:www-data /var/www/html
 
-EXPOSE 8080
-CMD ["railway-start"]
+RUN a2enmod rewrite
+
+RUN echo "<?php phpinfo(); ?>" > /var/www/html/index.php
+
+EXPOSE 80
+
+CMD ["apache2-foreground"]
