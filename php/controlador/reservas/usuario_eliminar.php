@@ -1,0 +1,3 @@
+<?php
+session_start();require_once($_SERVER['DOCUMENT_ROOT'].'/version_final/php/modelo/conexion.php');require_once($_SERVER['DOCUMENT_ROOT'].'/version_final/includes/flash.php');if(!isset($_SESSION['id'])){header('Location: /version_final/paginas/login.php');exit;}$id=(int)($_POST['id']??0);$q=$conexion->prepare("UPDATE reservas SET estado='cancelada' WHERE id=? AND usuario_id=? AND estado='pendiente'");$q->bind_param('ii',$id,$_SESSION['id']);$q->execute();flash_set($q->affected_rows?'success':'warning',$q->affected_rows?'Reserva cancelada.':'No fue posible cancelar la reserva.');header('Location: /version_final/paginas/mis_reservas.php');
+?>
